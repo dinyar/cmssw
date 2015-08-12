@@ -49,10 +49,15 @@ const char * BeamMonitor::formatFitTime( const time_t & t )  {
   tm * ptm;
   ptm = gmtime ( &t );
   int year = ptm->tm_year;
-  if (year < 1995) {
-    edm::LogError("BadTimeStamp") << "year reported is " << year << "!! resetting to 2011..." << std::endl;
-    year = 2012;
-  }
+ //check if year is ok
+ if (year <= 37) year += 2000;                                                        
+ if (year >= 70 && year <= 137) year += 1900;                                         
+             
+  if (year < 1995){                                                                   
+        edm::LogError("BadTimeStamp") << "year reported is " << year <<" !!"<<std::endl;
+        year = 2015; //overwritten later by BeamFitter.cc for fits but needed here for TH1
+        edm::LogError("BadTimeStamp") << "Resetting to " <<year<<std::endl;
+      } 
   sprintf( ts, "%4d-%02d-%02d %02d:%02d:%02d", year,ptm->tm_mon+1,ptm->tm_mday,(ptm->tm_hour+CEST)%24, ptm->tm_min, ptm->tm_sec);
 
 #ifdef STRIP_TRAILING_BLANKS_IN_TIMEZONE
@@ -263,7 +268,7 @@ void BeamMonitor::beginJob() {
 
   h_vy_dz = dbe_->bookProfile("vy_dz","v_{y} vs. dz of selected tracks",dzBin,dzMin,dzMax,dxBin,dxMin,dxMax,"");
   h_vy_dz->setAxisTitle("dz (cm)",1);
-  h_vy_dz->setAxisTitle("x coordinate of input track at PCA (cm)",2);
+  h_vy_dz->setAxisTitle("y coordinate of input track at PCA (cm)",2);
 
   h_x0 = dbe_->book1D("BeamMonitorFeedBack_x0","x coordinate of beam spot (Fit)",100,-0.01,0.01);
   h_x0->setAxisTitle("x_{0} (cm)",1);
@@ -575,6 +580,7 @@ void BeamMonitor::analyze(const Event& iEvent,
     for(int n=0; n < tmphisto->GetNbinsX(); n++)
       cutFlowTable->setBinLabel(n+1,tmphisto->GetXaxis()->GetBinLabel(n+1),1);
   cutFlowTable = dbe_->book1D(cutFlowTableName, tmphisto);
+  delete tmphisto;
 
   //----Reco tracks -------------------------------------
   Handle<reco::TrackCollection> TrackCollection;
@@ -952,6 +958,7 @@ void BeamMonitor::FitAndFill(const LuminosityBlock& lumiSeg,int &lastlumi,int &n
       h_PVz[1]->update();
       h_PVz[1] = dbe_->book1D(tmpfile,h_PVz[0]->getTH1F());
       h_PVz[1]->getTH1()->Fit(fgaus.get(),"QLM");
+      delete tmphisto;
 
     }//check if found min Vertices
   }//do PVfit

@@ -7,6 +7,7 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.Modules import _Module
 import sys
 import re
+import collections
 
 class Options:
         pass
@@ -158,13 +159,23 @@ def MassReplaceInputTag(aProcess,oldT="rawDataCollector",newT="rawDataRepacker")
 	for s in aProcess.paths_().keys():
 		massSearchReplaceAnyInputTag(getattr(aProcess,s),oldT,newT)
 
+def anyOf(listOfKeys,dict,opt=None):
+	for k in listOfKeys:
+		if k in dict:
+			toReturn=dict[k]
+			dict.pop(k)
+			return toReturn
+	if opt!=None:
+		return opt
+	else:
+		raise Exception("any of "+','.join(listOfKeys)+" are mandatory entries of --output options")
 
 class ConfigBuilder(object):
     """The main building routines """
 
     def __init__(self, options, process = None, with_output = False, with_input = False ):
         """options taken from old cmsDriver and optparse """
-
+	    
         options.outfile_name = options.dirout+options.fileout
 
         self._options = options
@@ -174,8 +185,18 @@ class ConfigBuilder(object):
         #if not self._options.conditions:
         #        raise Exception("ERROR: No conditions given!\nPlease specify conditions. E.g. via --conditions=IDEAL_30X::All")
 
-	if hasattr(self._options,"datatier") and self._options.datatier and 'DQMIO' in self._options.datatier and 'ENDJOB' in self._options.step:
-		self._options.step=self._options.step.replace(',ENDJOB','')
+	# check that MEtoEDMConverter (running in ENDJOB) and DQMIO don't run in the same job
+	if 'ENDJOB' in self._options.step:
+		if  (hasattr(self._options,"outputDefinition") and \
+		    self._options.outputDefinition != '' and \
+		    any(anyOf(['t','tier','dataTier'],outdic) == 'DQMIO' for outdic in eval(self._options.outputDefinition))) or \
+		    (hasattr(self._options,"datatier") and \
+		    self._options.datatier and \
+		    'DQMIO' in self._options.datatier):
+			print "removing ENDJOB from steps since not compatible with DQMIO dataTier" 
+			self._options.step=self._options.step.replace(',ENDJOB','')
+
+
 		
         # what steps are provided by this class?
         stepList = [re.sub(r'^prepare_', '', methodName) for methodName in ConfigBuilder.__dict__ if methodName.startswith('prepare_')]
@@ -461,18 +482,7 @@ class ConfigBuilder(object):
 	if self._options.outputDefinition:
 		if self._options.datatier:
 			print "--datatier & --eventcontent options ignored"
-			
-		def anyOf(listOfKeys,dict,opt=None):
-			for k in listOfKeys:
-				if k in dict:
-					toReturn=dict[k]
-					dict.pop(k)
-					return toReturn
-			if opt!=None:
-				return opt
-			else:
-				raise Exception("any of "+','.join(listOfKeys)+" are mandatory entries of --output options")
-				
+							
 		#new output convention with a list of dict
 		outList = eval(self._options.outputDefinition)
 		for (id,outDefDict) in enumerate(outList):
@@ -789,7 +799,7 @@ class ConfigBuilder(object):
 		for c in self._options.customisation_file_unsch:
 			custOpt.extend(c.split(","))
 
-	custMap={}
+	custMap=collections.OrderedDict()
 	for opt in custOpt:
 		if opt=='': continue
 		if opt.count('.')>1:
@@ -848,14 +858,15 @@ class ConfigBuilder(object):
 	if len(custMap)!=0:
 		final_snippet += '\n# End of customisation functions\n'
 
-	### now for a usuful command
-	if self._options.customise_commands:
-		import string
-		final_snippet +='\n# Customisation from command line'
-		for com in self._options.customise_commands.split('\\n'):
-			com=string.lstrip(com)
-			self.executeAndRemember(com)
-			final_snippet +='\n'+com
+	### now for a useful command
+	if unsch==1 or not self._options.runUnscheduled:
+		if self._options.customise_commands:
+			import string
+			final_snippet +='\n# Customisation from command line'
+			for com in self._options.customise_commands.split('\\n'):
+				com=string.lstrip(com)
+				self.executeAndRemember(com)
+				final_snippet +='\n'+com
 
         return final_snippet
 
@@ -1475,27 +1486,22 @@ class ConfigBuilder(object):
 
     def prepare_L1(self, sequence = None):
 	    """ Enrich the schedule with the L1 simulation step"""
-	    if not sequence:
-		    self.loadAndRemember(self.L1EMDefaultCFF)
-	    else:
-		    # let the L1 package decide for the scenarios available
-		    from L1Trigger.Configuration.ConfigBuilder import getConfigsForScenario
-		    listOfImports = getConfigsForScenario(sequence)
-		    for file in listOfImports:
-			    self.loadAndRemember(file)
+            assert(sequence == None)
+	    self.loadAndRemember(self.L1EMDefaultCFF)
 	    self.scheduleSequence('SimL1Emulator','L1simulation_step')
 	    return
 
     def prepare_L1REPACK(self, sequence = None):
             """ Enrich the schedule with the L1 simulation step, running the L1 emulator on data unpacked from the RAW collection, and repacking the result in a new RAW collection"""
-            if sequence is not 'GT':
-                  print 'Running the full L1 emulator is not supported yet'
-                  raise Exception('unsupported feature')
-            if sequence is 'GT':
-                  self.loadAndRemember('Configuration/StandardSequences/SimL1EmulatorRepack_GT_cff')
-		  if self._options.scenario == 'HeavyIons':
-			  self.renameInputTagsInSequence("SimL1Emulator","rawDataCollector","rawDataRepacker")
-                  self.scheduleSequence('SimL1Emulator','L1simulation_step')
+	    supported = ['GT','GT1','GT2','GCTGT']
+            if sequence in supported:
+                self.loadAndRemember('Configuration/StandardSequences/SimL1EmulatorRepack_%s_cff'%sequence)
+		if self._options.scenario == 'HeavyIons':
+			self.renameInputTagsInSequence("SimL1Emulator","rawDataCollector","rawDataRepacker")
+		self.scheduleSequence('SimL1Emulator','L1RePack_step')
+	    else:
+                print "L1REPACK with '",sequence,"' is not supported! Supported choices are: ",supported
+                raise Exception('unsupported feature')
 
 
     def prepare_HLT(self, sequence = None):
@@ -1959,6 +1965,12 @@ class ConfigBuilder(object):
 
         # decide which AlcaHARVESTING paths to use
         harvestingList = sequence.split("+")
+
+
+
+ 	from Configuration.AlCa.autoPCL import autoPCL
+ 	self.expandMapping(harvestingList,autoPCL)
+	
         for name in harvestingConfig.__dict__:
             harvestingstream = getattr(harvestingConfig,name)
             if name in harvestingList and isinstance(harvestingstream,cms.Path):
