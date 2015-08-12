@@ -55,7 +55,7 @@ def L1NtupleAODRAW(process):
     )
 
     process.load('L1Trigger.L1TNtuples.L1NtupleAODRAW_cff')
-    process.l1ntupleaod = cms.Path(
+    process.l1ntupleaodraw = cms.Path(
         process.L1NtupleAODRAW
     )
 
