@@ -175,6 +175,10 @@ if (eras.stage2L1Trigger.isChosen()):
 #    src = cms.InputTag("genParticles"),
 #    cut = cms.string("abs(pdgId) == 13")
 #)
+process.l1MuonFilter = cms.EDFilter("SelectL1Muons",
+                                    ugmtInput = cms.InputTag("simGmtStage2Digis"),
+                                    gmtInput = cms.InputTag("gtDigis"),
+                                   )
 
 process.load("L1Trigger.L1TNtuples.l1MuonUpgradeTreeProducer_cfi")
 process.l1MuonUpgradeTreeProducer.ugmtTag = cms.InputTag("simGmtStage2Digis")
@@ -232,11 +236,13 @@ process.L1TSeq = cms.Sequence(   process.RawToDigi
 # Comment this next module to silence per event dump of L1T objects:
 #                                   + process.l1tSummaryB
 #                                   + process.l1tGlobalAnalyzer
+#                                   + process.l1MuonFilter
                                    + process.l1UpgradeTree
 )
 
 process.L1TPath = cms.Path(process.L1TSeq + process.L1NtupleSeq)
 #process.L1TPath = cms.Path(process.L1TSeq)
+process.L1TPath.remove(process.simGtStage2Digis)
 
 process.out = cms.OutputModule("PoolOutputModule", 
    fileName = cms.untracked.string("l1t.root"),
