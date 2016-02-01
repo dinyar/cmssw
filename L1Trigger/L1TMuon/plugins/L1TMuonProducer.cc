@@ -96,6 +96,8 @@ using namespace l1t;
                                    int bx) const;
 
         // ----------member data ---------------------------
+        int m_bxMin;
+        int m_bxMax;
         std::unique_ptr<L1TMuonGlobalParams> microGMTParams;
         edm::InputTag m_barrelTfInputTag;
         edm::InputTag m_overlapTfInputTag;
@@ -148,8 +150,6 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig) : m_debugOut(
   produces<MuonBxCollection>("imdMuonsEMTFNeg");
   produces<MuonBxCollection>("imdMuonsOMTFPos");
   produces<MuonBxCollection>("imdMuonsOMTFNeg");
-
-  microGMTParams = std::unique_ptr<L1TMuonGlobalParams>(new L1TMuonGlobalParams());
 }
 
 L1TMuonProducer::~L1TMuonProducer()
@@ -182,25 +182,20 @@ L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<MicroGMTConfiguration::InputCollection> omtfMuons;
   Handle<MicroGMTConfiguration::CaloInputCollection> trigTowers;
 
-  // iEvent.getByToken(m_barrelTfInputToken, bmtfMuons);
   iEvent.getByToken(m_barrelTfInputToken, bmtfMuons);
   iEvent.getByToken(m_endcapTfInputToken, emtfMuons);
   iEvent.getByToken(m_overlapTfInputToken, omtfMuons);
   iEvent.getByToken(m_caloTowerInputToken, trigTowers);
 
-  // find out the BX range from the inputs
-  int firstBx = std::min({bmtfMuons->getFirstBX(), emtfMuons->getFirstBX(), omtfMuons->getFirstBX(), trigTowers->getFirstBX()});
-  int lastBx = std::max({bmtfMuons->getLastBX(), emtfMuons->getLastBX(), omtfMuons->getLastBX(), trigTowers->getLastBX()});
-
   // set BX range for outputs
-  outMuons->setBXRange(firstBx, lastBx);
-  imdMuonsBMTF->setBXRange(bmtfMuons->getFirstBX(), bmtfMuons->getLastBX());
-  imdMuonsEMTFPos->setBXRange(emtfMuons->getFirstBX(), emtfMuons->getLastBX());
-  imdMuonsEMTFNeg->setBXRange(emtfMuons->getFirstBX(), emtfMuons->getLastBX());
-  imdMuonsOMTFPos->setBXRange(omtfMuons->getFirstBX(), omtfMuons->getLastBX());
-  imdMuonsOMTFNeg->setBXRange(omtfMuons->getFirstBX(), omtfMuons->getLastBX());
+  outMuons->setBXRange(m_bxMin, m_bxMax);
+  imdMuonsBMTF->setBXRange(m_bxMin, m_bxMax);
+  imdMuonsEMTFPos->setBXRange(m_bxMin, m_bxMax);
+  imdMuonsEMTFNeg->setBXRange(m_bxMin, m_bxMax);
+  imdMuonsOMTFPos->setBXRange(m_bxMin, m_bxMax);
+  imdMuonsOMTFNeg->setBXRange(m_bxMin, m_bxMax);
 
-  for (int bx = firstBx; bx <= lastBx; ++bx) {
+  for (int bx = m_bxMin; bx <= m_bxMax; ++bx) {
     m_isolationUnit.setTowerSums(*trigTowers, bx);
     MicroGMTConfiguration::InterMuonList internMuonsBmtf;
     MicroGMTConfiguration::InterMuonList internMuonsEmtfPos;
@@ -447,7 +442,9 @@ L1TMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
   }
 
   //microGMTParams->print(std::cout);
-  m_rankPtQualityLUT = l1t::MicroGMTRankPtQualLUTFactory::create(microGMTParams->sortRankLUTPath(), microGMTParams->fwVersion());
+  m_bxMin = microGMTParams->bxMin();
+  m_bxMax = microGMTParams->bxMax();
+  m_rankPtQualityLUT = l1t::MicroGMTRankPtQualLUTFactory::create(microGMTParams->sortRankLUTPath(), microGMTParams->fwVersion(), microGMTParams->sortRankLUTPtFactor(), microGMTParams->sortRankLUTQualFactor());
   m_isolationUnit.initialise(microGMTParams.get());
   m_cancelOutUnit.initialise(microGMTParams.get());
 }
