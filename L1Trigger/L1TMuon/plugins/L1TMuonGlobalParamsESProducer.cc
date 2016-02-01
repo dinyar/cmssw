@@ -69,15 +69,29 @@ L1TMuonGlobalParamsESProducer::L1TMuonGlobalParamsESProducer(const edm::Paramete
 
    m_params.setFwVersion(fwVersion);
 
+   int bxMin = iConfig.getParameter<int>("bxMin");
+   int bxMax = iConfig.getParameter<int>("bxMax");
+   if (bxMin > bxMax) {
+      m_params.setBxMin(bxMax);
+      m_params.setBxMax(bxMin);
+   } else {
+      m_params.setBxMin(bxMin);
+      m_params.setBxMax(bxMax);
+   }
+
    //m_params.setBrlSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("BrlSingleMatchQualLUTMaxDR"));
    m_params.setFwdPosSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("FwdPosSingleMatchQualLUTMaxDR"));
    m_params.setFwdNegSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("FwdNegSingleMatchQualLUTMaxDR"));
    m_params.setOvlPosSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("OvlPosSingleMatchQualLUTMaxDR"));
    m_params.setOvlNegSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("OvlNegSingleMatchQualLUTMaxDR"));
-   m_params.setBOPosMatchQualLUTMaxDR(iConfig.getParameter<double>("BOPosMatchQualLUTMaxDR"));
-   m_params.setBONegMatchQualLUTMaxDR(iConfig.getParameter<double>("BONegMatchQualLUTMaxDR"));
+   m_params.setBOPosMatchQualLUTMaxDR(iConfig.getParameter<double>("BOPosMatchQualLUTMaxDR"), iConfig.getParameter<double>("BOPosMatchQualLUTMaxDREtaFine"));
+   m_params.setBONegMatchQualLUTMaxDR(iConfig.getParameter<double>("BONegMatchQualLUTMaxDR"), iConfig.getParameter<double>("BONegMatchQualLUTMaxDREtaFine"));
    m_params.setFOPosMatchQualLUTMaxDR(iConfig.getParameter<double>("FOPosMatchQualLUTMaxDR"));
    m_params.setFONegMatchQualLUTMaxDR(iConfig.getParameter<double>("FONegMatchQualLUTMaxDR"));
+
+   unsigned sortRankLUTPtFactor = iConfig.getParameter<unsigned>("SortRankLUTPtFactor");
+   unsigned sortRankLUTQualFactor = iConfig.getParameter<unsigned>("SortRankLUTQualFactor");
+   m_params.setSortRankLUTFactors(sortRankLUTPtFactor, sortRankLUTQualFactor);
 
    auto absIsoCheckMemLUT = l1t::MicroGMTAbsoluteIsolationCheckLUTFactory::create (iConfig.getParameter<std::string>("AbsIsoCheckMemLUTPath"), fwVersion);
    auto relIsoCheckMemLUT = l1t::MicroGMTRelativeIsolationCheckLUTFactory::create (iConfig.getParameter<std::string>("RelIsoCheckMemLUTPath"), fwVersion);
@@ -98,7 +112,7 @@ L1TMuonGlobalParamsESProducer::L1TMuonGlobalParamsESProducer(const edm::Paramete
    auto bEtaExtrapolationLUT = l1t::MicroGMTExtrapolationLUTFactory::create (iConfig.getParameter<std::string>("BEtaExtrapolationLUTPath"), l1t::MicroGMTConfiguration::ETA_OUT, fwVersion);
    auto oEtaExtrapolationLUT = l1t::MicroGMTExtrapolationLUTFactory::create (iConfig.getParameter<std::string>("OEtaExtrapolationLUTPath"), l1t::MicroGMTConfiguration::ETA_OUT, fwVersion);
    auto fEtaExtrapolationLUT = l1t::MicroGMTExtrapolationLUTFactory::create (iConfig.getParameter<std::string>("FEtaExtrapolationLUTPath"), l1t::MicroGMTConfiguration::ETA_OUT, fwVersion);
-   auto rankPtQualityLUT = l1t::MicroGMTRankPtQualLUTFactory::create (iConfig.getParameter<std::string>("SortRankLUTPath"), fwVersion);
+   auto rankPtQualityLUT = l1t::MicroGMTRankPtQualLUTFactory::create (iConfig.getParameter<std::string>("SortRankLUTPath"), fwVersion, sortRankLUTPtFactor, sortRankLUTQualFactor);
    m_params.setAbsIsoCheckMemLUT(*absIsoCheckMemLUT);
    m_params.setRelIsoCheckMemLUT(*relIsoCheckMemLUT);
    m_params.setIdxSelMemPhiLUT(*idxSelMemPhiLUT);
