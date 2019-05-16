@@ -3,6 +3,7 @@
 
 #include "L1Trigger/L1TMuon/interface/RegionalMuonRawDigiTranslator.h"
 #include <vector>
+#include <map>
 
 namespace L1Analysis
 {
@@ -28,6 +29,8 @@ namespace L1Analysis
       tfMuonBx.clear();
       tfMuonWh.clear();
       tfMuonTrAdd.clear();
+      tfMuonDecodedTrAdd.clear();
+      tfMuonRawTrAdd.clear();
     }
 
     unsigned short int nTfMuons;
@@ -45,7 +48,8 @@ namespace L1Analysis
     std::vector<short int> tfMuonBx;
     std::vector<short int> tfMuonWh;
     std::vector<short int> tfMuonTrAdd;
-    std::vector<short int> tfMuonRawTrAdd;
+    std::vector<std::map<std::string, int>> tfMuonDecodedTrAdd;
+    std::vector<int> tfMuonRawTrAdd;
   };
 }
 #endif
