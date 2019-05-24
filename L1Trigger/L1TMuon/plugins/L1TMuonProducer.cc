@@ -119,6 +119,7 @@ using namespace l1t;
         MicroGMTIsolationUnit m_isolationUnit;
         MicroGMTCancelOutUnit m_cancelOutUnit;
         std::ofstream m_debugOut;
+        l1t::cancelmode m_bmtfCancelMode;
         l1t::cancelmode m_emtfCancelMode;
 
         edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_barrelTfInputToken;
@@ -140,7 +141,9 @@ using namespace l1t;
 //
 // constructors and destructor
 //
-L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig) : m_debugOut("test/debug/iso_debug.dat"), m_emtfCancelMode(cancelmode::coordinate)
+L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig) : m_debugOut("test/debug/iso_debug.dat"),
+                                                                     m_bmtfCancelMode(cancelmode::tracks),
+                                                                     m_emtfCancelMode(cancelmode::coordinate)
 {
   // edm::InputTag barrelTfInputTag = iConfig.getParameter<edm::InputTag>("barrelTFInput");
   // edm::InputTag overlapTfInputTag = iConfig.getParameter<edm::InputTag>("overlapTFInput");
@@ -156,8 +159,13 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig) : m_debugOut(
   m_bxMax = iConfig.getParameter<int>("bxMax");
 
   m_autoCancelMode = iConfig.getParameter<bool>("autoCancelMode");
-  if (!m_autoCancelMode && iConfig.getParameter<std::string>("emtfCancelMode").find("tracks") == 0) {
-    m_emtfCancelMode = cancelmode::tracks;
+  if (!m_autoCancelMode) {
+    if (iConfig.getParameter<std::string>("bmtfCancelMode").find("kftracks") == 0) {
+      m_bmtfCancelMode = cancelmode::kftracks;
+    }
+    if (iConfig.getParameter<std::string>("emtfCancelMode").find("tracks") == 0) {
+      m_emtfCancelMode = cancelmode::tracks;
+    }
   }
 
   m_barrelTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_barrelTfInputTag);
@@ -278,7 +286,7 @@ L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     splitAndConvertMuons(omtfMuons, internMuonsOmtfPos, internMuonsOmtfNeg, omtfPosWedges, omtfNegWedges, bx);
 
     // cancel out within the track finders:
-    m_cancelOutUnit.setCancelOutBits(bmtfWedges, tftype::bmtf, cancelmode::tracks);
+    m_cancelOutUnit.setCancelOutBits(bmtfWedges, tftype::bmtf, m_bmtfCancelMode);
     m_cancelOutUnit.setCancelOutBits(omtfPosWedges, tftype::omtf_pos, cancelmode::coordinate);
     m_cancelOutUnit.setCancelOutBits(omtfNegWedges, tftype::omtf_neg, cancelmode::coordinate);
     m_cancelOutUnit.setCancelOutBits(emtfPosWedges, tftype::emtf_pos, m_emtfCancelMode);
@@ -514,7 +522,7 @@ L1TMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
   microGMTParamsRcd.get(microGMTParamsHandle);
 
   std::unique_ptr<L1TMuonGlobalParams_PUBLIC> microGMTParams( new L1TMuonGlobalParams_PUBLIC( cast_to_L1TMuonGlobalParams_PUBLIC(*microGMTParamsHandle.product()) ) );
-  if( microGMTParams->pnodes_.empty() ){ 
+  if( microGMTParams->pnodes_.empty() ){
       edm::ESHandle<L1TMuonGlobalParams> o2oProtoHandle;
       iSetup.get<L1TMuonGlobalParamsO2ORcd>().get(o2oProtoHandle);
       microGMTParamsHelper = std::unique_ptr<L1TMuonGlobalParamsHelper>(new L1TMuonGlobalParamsHelper(*o2oProtoHandle.product()));
@@ -538,8 +546,14 @@ L1TMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
   m_isolationUnit.initialise(microGMTParamsHelper.get());
   m_cancelOutUnit.initialise(microGMTParamsHelper.get());
 
-  if (m_autoCancelMode && microGMTParamsHelper->fwVersion() > 0x5000000) {
-    m_emtfCancelMode = cancelmode::tracks;
+  if (m_autoCancelMode) {
+    if (microGMTParamsHelper->fwVersion() >= 0x5010000) {
+      m_bmtfCancelMode = cancelmode::kftracks;
+    }
+    // TODO: No decision yet on when to use EMTF track addresses for cancel-out.
+    // if (microGMTParamsHelper->fwVersion() > 0x5000000) {
+    //   m_emtfCancelMode = cancelmode::tracks;
+    // }
   }
 }
 
