@@ -9,7 +9,7 @@ namespace L1Analysis
   {
     L1AnalysisL1UpgradeTfMuonDataFormat(){ Reset();};
     ~L1AnalysisL1UpgradeTfMuonDataFormat(){};
-    
+
     void Reset()
     {
       nTfMuons = 0;
@@ -27,8 +27,10 @@ namespace L1Analysis
       tfMuonBx.clear();
       tfMuonWh.clear();
       tfMuonTrAdd.clear();
+      tfMuonHwPtDispl.clear();
+      tfMuonHwDxy.clear();
     }
-   
+
     unsigned short int nTfMuons;
     std::vector<short int> tfMuonHwPt;
     std::vector<short int> tfMuonHwEta;
@@ -44,7 +46,8 @@ namespace L1Analysis
     std::vector<short int> tfMuonBx;
     std::vector<short int> tfMuonWh;
     std::vector<short int> tfMuonTrAdd;
-  }; 
+    std::vector<short int> tfMuonHwPtDispl;
+    std::vector<short int> tfMuonHwDxy;
+  };
 }
 #endif
-
