@@ -337,17 +337,16 @@ L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         math::PtEtaPhiMLorentzVector vec{(mu->hwPt()-1)*0.5, mu->hwEta()*0.010875, mu->hwGlobalPhi()*0.010908, 0.0};
         int iso = mu->hwAbsIso() + (mu->hwRelIso() << 1);
         int outMuQual = MicroGMTConfiguration::setOutputMuonQuality(mu->hwQual(), mu->trackFinderType(), mu->hwHF());
-        Muon outMu{vec, mu->hwPt(), mu->hwEta(), mu->hwGlobalPhi(), outMuQual, mu->hwSign(), mu->hwSignValid(), iso, mu->tfMuonIndex(), 0, true, mu->hwIsoSum(), mu->hwDPhi(), mu->hwDEta(), mu->hwRank()};
+        Muon outMu{vec, mu->hwPt(), mu->hwEta(), mu->hwGlobalPhi(), outMuQual, mu->hwSign(), mu->hwSignValid(),
+                   iso, mu->tfMuonIndex(), 0, true, mu->hwIsoSum(), mu->hwDPhi(), mu->hwDEta(), mu->hwRank(),
+                   MicroGMTConfiguration::calcMuonHwEtaExtra(outMu), MicroGMTConfiguration::calcMuonHwPhiExtra(outMu), // set the coordinates at the vertex
+                   MicroGMTConfiguration::calcMuonEtaExtra(outMu), MicroGMTConfiguration::calcMuonPhiExtra(outMu),     // set the coordinates at the vertex
+                   mu->hwPtUnconstrained(), mu->hwDXY()};
         if (mu->hwSignValid()) {
           outMu.setCharge(1 - 2 * mu->hwSign());
         } else {
           outMu.setCharge(0);
         }
-        // set the coordinates at the vertex
-        outMu.setHwEtaAtVtx(MicroGMTConfiguration::calcMuonHwEtaExtra(outMu));
-        outMu.setHwPhiAtVtx(MicroGMTConfiguration::calcMuonHwPhiExtra(outMu));
-        outMu.setEtaAtVtx(MicroGMTConfiguration::calcMuonEtaExtra(outMu));
-        outMu.setPhiAtVtx(MicroGMTConfiguration::calcMuonPhiExtra(outMu));
         m_debugOut << mu->hwCaloPhi() << " " << mu->hwCaloEta() << std::endl;
         outMuons->push_back(bx, outMu);
       }
@@ -551,7 +550,7 @@ L1TMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
   m_cancelOutUnit.initialise(microGMTParamsHelper.get());
 
   if (m_autoCancelMode) {
-    if (microGMTParamsHelper->fwVersion() >= 0x5010000) {
+    if (microGMTParamsHelper->fwVersion() >= 0x6000000) {
       m_bmtfCancelMode = cancelmode::kftracks;
     }
     // TODO: No decision yet on when to use EMTF track addresses for cancel-out.
