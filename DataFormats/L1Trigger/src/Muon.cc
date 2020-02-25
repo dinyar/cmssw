@@ -14,7 +14,9 @@ l1t::Muon::Muon()
     hwEtaAtVtx_(0),
     hwPhiAtVtx_(0),
     etaAtVtx_(0.),
-    phiAtVtx_(0.)
+    phiAtVtx_(0.),
+    hwPtUnconstrained_(0),
+    hwDXY_(0)
 {
 
 }
@@ -37,7 +39,9 @@ l1t::Muon::Muon( const LorentzVector& p4,
     int hwEtaAtVtx,
     int hwPhiAtVtx,
     double etaAtVtx,
-    double phiAtVtx)
+    double phiAtVtx,
+    int ptUnconstrained,
+    int dXY)
   : L1Candidate(p4, pt, eta, phi, qual, iso),
     hwCharge_(charge),
     hwChargeValid_(chargeValid),
@@ -51,9 +55,11 @@ l1t::Muon::Muon( const LorentzVector& p4,
     hwEtaAtVtx_(hwEtaAtVtx),
     hwPhiAtVtx_(hwPhiAtVtx),
     etaAtVtx_(etaAtVtx),
-    phiAtVtx_(phiAtVtx)
+    phiAtVtx_(phiAtVtx),
+    hwPtUnconstrained_(ptUnconstrained),
+    hwDXY_(dXY)
 {
-  
+
 }
 
 l1t::Muon::Muon( const PolarLorentzVector& p4,
@@ -74,7 +80,9 @@ l1t::Muon::Muon( const PolarLorentzVector& p4,
     int hwEtaAtVtx,
     int hwPhiAtVtx,
     double etaAtVtx,
-    double phiAtVtx)
+    double phiAtVtx,
+    int ptUnconstrained,
+    int dXY)
   : L1Candidate(p4, pt, eta, phi, qual, iso),
     hwCharge_(charge),
     hwChargeValid_(chargeValid),
@@ -88,12 +96,14 @@ l1t::Muon::Muon( const PolarLorentzVector& p4,
     hwEtaAtVtx_(hwEtaAtVtx),
     hwPhiAtVtx_(hwPhiAtVtx),
     etaAtVtx_(etaAtVtx),
-    phiAtVtx_(phiAtVtx)
+    phiAtVtx_(phiAtVtx),
+    hwPtUnconstrained_(ptUnconstrained),
+    hwDXY_(dXY)
 {
-  
+
 }
 
-l1t::Muon::~Muon() 
+l1t::Muon::~Muon()
 {
 
 }
@@ -105,6 +115,7 @@ bool l1t::Muon::operator==(const l1t::Muon& rhs) const
       && hwChargeValid_ == rhs.hwChargeValid()
       && tfMuonIndex_ == rhs.tfMuonIndex()
       && hwEtaAtVtx_ == rhs.hwEtaAtVtx()
-      && hwPhiAtVtx_ == rhs.hwPhiAtVtx();
+      && hwPhiAtVtx_ == rhs.hwPhiAtVtx()
+      && hwPtUnconstrained_ == rhs.hwPtUnconstrained()
+      && hwDXY_ == rhs.hwDXY();
 }
-

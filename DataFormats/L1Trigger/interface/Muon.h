@@ -19,7 +19,7 @@ namespace l1t {
   typedef ObjectRefPairBxCollection<Muon> MuonRefPairBxCollection;
 
   class Muon : public L1Candidate {
-    
+
   public:
     Muon();
 
@@ -32,7 +32,7 @@ namespace l1t {
       int chargeValid=0,
       int iso=0,
       int tfMuonIndex=-1,
-      int tag=0, 
+      int tag=0,
       bool debug = false,
       int isoSum = 0,
       int dPhi = 0,
@@ -41,8 +41,10 @@ namespace l1t {
       int hwEtaAtVtx = 0,
       int hwPhiAtVtx = 0,
       double etaAtVtx = 0.,
-      double phiAtVtx = 0.);
-    
+      double phiAtVtx = 0.,
+      int ptUnconstrained = 0,
+      int dXY = 0);
+
     Muon( const PolarLorentzVector& p4,
       int pt=0,
       int eta=0,
@@ -52,7 +54,7 @@ namespace l1t {
       int chargeValid=0,
       int iso=0,
       int tfMuonIndex=-1,
-      int tag=0, 
+      int tag=0,
       bool debug = false,
       int isoSum = 0,
       int dPhi = 0,
@@ -61,9 +63,11 @@ namespace l1t {
       int hwEtaAtVtx = 0,
       int hwPhiAtVtx = 0,
       double etaAtVtx = 0.,
-      double phiAtVtx = 0.);
+      double phiAtVtx = 0.,
+      int ptUnconstrained = 0,
+      int dXY = 0);
 
-    ~Muon();    
+    ~Muon();
 
     // set values
     inline void setHwCharge(int charge) { hwCharge_ = charge; };
@@ -80,6 +84,9 @@ namespace l1t {
     inline void setHwDPhiExtra(int dPhi) { hwDPhiExtra_ = dPhi; };
     inline void setHwDEtaExtra(int dEta) { hwDEtaExtra_ = dEta; };
     inline void setHwRank(int rank) { hwRank_ = rank; };
+
+    inline void setHwPtUnconstrained(int hwPtUnconstrained) { hwPtUnconstrained_ = hwPtUnconstrained; };
+    inline void setHwDXY(int hwDXY) { hwDXY_ = hwDXY; };
 
     inline void setDebug(bool debug) { debug_ = debug; };
 
@@ -99,13 +106,16 @@ namespace l1t {
     inline int hwDEtaExtra() const { return hwDEtaExtra_; };
     inline int hwRank() const { return hwRank_; };
 
+    inline int hwPtUnconstrained() const { return hwPtUnconstrained_; };
+    inline int hwDXY() const { return hwDXY_; };
+
     inline bool debug() const { return debug_; };
 
     virtual bool operator==(const l1t::Muon& rhs) const;
     virtual inline bool operator!=(const l1t::Muon& rhs) const { return !(operator==(rhs)); };
- 
+
   private:
-    
+
     // additional hardware quantities common to L1 global jet
     int hwCharge_;
     int hwChargeValid_;
@@ -118,14 +128,18 @@ namespace l1t {
     int hwDPhiExtra_;
     int hwDEtaExtra_;
     int hwRank_;
-    
+
     // muon coordinates at the vertex
     int hwEtaAtVtx_;
     int hwPhiAtVtx_;
     double etaAtVtx_;
     double phiAtVtx_;
+
+    // displacement information
+    int hwPtUnconstrained_;
+    int hwDXY_;
   };
-  
+
 }
 
 #endif
