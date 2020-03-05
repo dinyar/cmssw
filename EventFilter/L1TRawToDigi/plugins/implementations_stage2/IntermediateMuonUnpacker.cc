@@ -113,7 +113,7 @@ namespace l1t {
             unsigned int muonCnt = 0;
             for (unsigned nWord = 0; nWord < nWords_; nWord += 2, ++muonCnt) {
                uint32_t raw_data_00_31 = payload[i++];
-               uint32_t raw_data_32_63 = payload[i++];        
+               uint32_t raw_data_32_63 = payload[i++];
                LogDebug("L1T") << "raw_data_00_31 = 0x" << hex << raw_data_00_31 << " raw_data_32_63 = 0x" << raw_data_32_63;
                // skip empty muons (hwPt == 0)
                if (((raw_data_00_31 >> l1t::MuonRawDigiTranslator::ptShift_) & l1t::MuonRawDigiTranslator::ptMask_) == 0) {
@@ -126,11 +126,11 @@ namespace l1t {
                // The intermediate muons of the uGMT (FED number 1402) do not
                // have coordinates estimated at the vertex in the RAW data.
                // The corresponding bits are set to zero.
-               MuonRawDigiTranslator::fillMuon(mu, raw_data_00_31, raw_data_32_63, 1402, getAlgoVersion());
+               MuonRawDigiTranslator::fillMuon(mu, 0, raw_data_00_31, raw_data_32_63, 1402, getAlgoVersion(), nWord/2, true);
 
                LogDebug("L1T") << "Mu" << nWord/2 << ": eta " << mu.hwEta() << " phi " << mu.hwPhi() << " pT " << mu.hwPt() << " iso " << mu.hwIso() << " qual " << mu.hwQual() << " charge " << mu.hwCharge() << " charge valid " << mu.hwChargeValid();
 
-               if (muonCnt < coll1Cnt_) { 
+               if (muonCnt < coll1Cnt_) {
                  res1_->push_back(bx, mu);
                } else {
                  res2_->push_back(bx, mu);

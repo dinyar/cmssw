@@ -92,12 +92,12 @@ namespace l1t {
                      edm::LogWarning("L1T") << "Comma detected in raw data stream. Orbit number: " << block.amc().getOrbitNumber() << ", BX ID: " << block.amc().getBX() << ", BX: " << bx << ", linkId: " << linkId << ", Raw data: 0x" << hex << setw(8) << setfill('0') << raw_data_32_63 << setw(8) << setfill('0') << raw_data_00_31 << dec << ". Skip.";
                      continue;
                   }
- 
-                  RegionalMuonCand mu;
- 
-                  RegionalMuonRawDigiTranslator::fillRegionalMuonCand(mu, raw_data_00_31, raw_data_32_63, processor, trackFinder);
 
-                  LogDebug("L1T") << "Mu" << nWord/2 << ": eta " << mu.hwEta() << " phi " << mu.hwPhi() << " pT " << mu.hwPt() << " qual " << mu.hwQual() << " sign " << mu.hwSign() << " sign valid " << mu.hwSignValid();
+                  RegionalMuonCand mu;
+
+                  RegionalMuonRawDigiTranslator::fillRegionalMuonCand(mu, raw_data_00_31, raw_data_32_63, processor, trackFinder, isKalman_);
+
+                  LogDebug("L1T") << "Mu" << nWord/2 << ": eta " << mu.hwEta() << " phi " << mu.hwPhi() << " pT " << mu.hwPt() << " qual " << mu.hwQual() << " sign " << mu.hwSign() << " sign valid " << mu.hwSignValid() << " unconstrained pT " << mu.hwPt2();
 
                   res->push_back(bx, mu);
                }
