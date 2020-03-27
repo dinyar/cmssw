@@ -123,6 +123,7 @@ l1t::MuonRawDigiTranslator::fillMuonCoordinatesRun3(Muon& mu, uint32_t raw_data_
   // displacement information
   mu.setHwDXY((raw_data_32_63 >> dxyShift_) & dxyMask_);
   mu.setHwPtUnconstrained((raw_data_32_63 >> ptUnconstrainedShift_) & ptUnconstrainedMask_);
+  mu.setPtUnconstrained((mu.hwPtUnconstrained()-1)*0.5);
 }
 
 void

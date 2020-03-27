@@ -341,7 +341,8 @@ L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
                    iso, mu->tfMuonIndex(), 0, true, mu->hwIsoSum(), mu->hwDPhi(), mu->hwDEta(), mu->hwRank(),
                    MicroGMTConfiguration::calcMuonHwEtaExtra(outMu), MicroGMTConfiguration::calcMuonHwPhiExtra(outMu), // set the coordinates at the vertex
                    MicroGMTConfiguration::calcMuonEtaExtra(outMu), MicroGMTConfiguration::calcMuonPhiExtra(outMu),     // set the coordinates at the vertex
-                   mu->hwPtUnconstrained(), mu->hwDXY()};
+                   mu->hwPtUnconstrained(), (mu->hwPtUnconstrained()-1)*0.5,
+                   mu->hwDXY()};
         if (mu->hwSignValid()) {
           outMu.setCharge(1 - 2 * mu->hwSign());
         } else {
