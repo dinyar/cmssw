@@ -69,8 +69,9 @@ namespace l1t
            RegionalMuonCand muCand;
            RegionalMuonRawDigiTranslator::fillRegionalMuonCand(muCand, raw_first, raw_secnd, processor, tftype::bmtf, isKalman);
 
-           if (muCand.hwPt() == 0)
-           continue;
+           if (muCand.hwPt() == 0) {
+             continue;
+           }
 
            if (isKalman) {
              LogDebug("L1T") << "Pt = " << muCand.hwPt() << " eta: " << muCand.hwEta() << " phi: " << muCand.hwPhi() << " diplacedPt = " << muCand.hwPt2();
