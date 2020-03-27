@@ -3,8 +3,8 @@
 
 //-------------------------------------------------------------------------------
 // Created 20/04/2010 - E. Conte, A.C. Le Bihan
-// 
-// 
+//
+//
 // Original code : L1TriggerDPG/L1Ntuples/L1UpgradeTreeProducer - Jim Brooke
 //-------------------------------------------------------------------------------
 
@@ -42,15 +42,15 @@ namespace L1Analysis
       kAsymEt,
       kAsymHt,
       kAsymEtHF,
-      kAsymHtHF    
+      kAsymHtHF
   };
-  
+
   struct L1AnalysisL1UpgradeDataFormat
   {
-  
+
     L1AnalysisL1UpgradeDataFormat(){ Reset();};
     ~L1AnalysisL1UpgradeDataFormat(){};
-    
+
     void Reset()
     {
       nEGs = 0;
@@ -75,10 +75,10 @@ namespace L1Analysis
       nTaus = 0;
       tauEt.clear();
       tauEta.clear();
-      tauPhi.clear(); 
+      tauPhi.clear();
       tauIEt.clear();
       tauIEta.clear();
-      tauIPhi.clear(); 
+      tauIPhi.clear();
       tauIso.clear();
       tauBx.clear();
       tauTowerIPhi.clear();
@@ -110,11 +110,13 @@ namespace L1Analysis
 
       nMuons = 0;
       muonEt.clear();
+      muonEtUnconstrained.clear();
       muonEta.clear();
       muonPhi.clear();
       muonEtaAtVtx.clear();
       muonPhiAtVtx.clear();
       muonIEt.clear();
+      muonIEtUnconstrained.clear();
       muonIEta.clear();
       muonIPhi.clear();
       muonIEtaAtVtx.clear();
@@ -124,9 +126,10 @@ namespace L1Analysis
       muonChg.clear();
       muonIso.clear();
       muonQual.clear();
+      muonDxy.clear();
       muonTfMuonIdx.clear();
       muonBx.clear();
-      
+
       nSums = 0;
       sumType.clear();
       sumEt.clear();
@@ -136,7 +139,7 @@ namespace L1Analysis
       sumBx.clear();
 
     }
-   
+
     unsigned short int nEGs;
     std::vector<float> egEt;
     std::vector<float> egEta;
@@ -155,7 +158,7 @@ namespace L1Analysis
     std::vector<short int> egShape;
     std::vector<short int> egTowerHoE;
     std::vector<short int> egHwQual;
- 
+
     unsigned short int nTaus;
     std::vector<float> tauEt;
     std::vector<float> tauEta;
@@ -167,7 +170,7 @@ namespace L1Analysis
     std::vector<short int> tauBx;
     std::vector<short int> tauTowerIPhi;
     std::vector<short int> tauTowerIEta;
-    std::vector<short int> tauRawEt;    
+    std::vector<short int> tauRawEt;
     std::vector<short int> tauIsoEt;
     std::vector<short int> tauNTT;
     std::vector<short int> tauHasEM;
@@ -184,7 +187,7 @@ namespace L1Analysis
     std::vector<short int> jetBx;
     std::vector<short int> jetTowerIPhi;
     std::vector<short int> jetTowerIEta;
-    std::vector<short int> jetRawEt;    
+    std::vector<short int> jetRawEt;
     std::vector<short int> jetSeedEt;
     std::vector<short int> jetPUEt;
     std::vector<short int> jetPUDonutEt0;
@@ -194,11 +197,13 @@ namespace L1Analysis
 
     unsigned short int nMuons;
     std::vector<float>   muonEt;
+    std::vector<float>   muonEtUnconstrained;
     std::vector<float>   muonEta;
     std::vector<float>   muonPhi;
     std::vector<float>   muonEtaAtVtx;
     std::vector<float>   muonPhiAtVtx;
     std::vector<short int>   muonIEt;
+    std::vector<short int>   muonIEtUnconstrained;
     std::vector<short int>   muonIEta;
     std::vector<short int>   muonIPhi;
     std::vector<short int>   muonIEtaAtVtx;
@@ -208,10 +213,11 @@ namespace L1Analysis
     std::vector<short int>      muonChg;
     std::vector<unsigned short int> muonIso;
     std::vector<unsigned short int> muonQual;
+    std::vector<unsigned short int> muonDxy;
     std::vector<unsigned short int> muonTfMuonIdx;
     std::vector<short int>      muonBx;
 
-    
+
     unsigned short int nSums;
     std::vector<short int> sumType;
     std::vector<float> sumEt;
@@ -220,8 +226,6 @@ namespace L1Analysis
     std::vector<short int> sumIPhi;
     std::vector<float> sumBx;
 
-  }; 
+  };
 }
 #endif
-
-
