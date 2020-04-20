@@ -27,7 +27,7 @@ class L1TStage2uGMTMuon : public DQMEDAnalyzer {
   void bookHistograms(DQMStore::IBooker&, const edm::Run&, const edm::EventSetup&) override;
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
- private:  
+ private:
 
   edm::EDGetTokenT<l1t::MuonBxCollection> ugmtMuonToken;
   std::string monitorDir;
@@ -38,6 +38,8 @@ class L1TStage2uGMTMuon : public DQMEDAnalyzer {
   MonitorElement* ugmtMuonBX;
   MonitorElement* ugmtnMuons;
   MonitorElement* ugmtMuonhwPt;
+  MonitorElement* ugmtMuonhwPtUnconstrained;
+  MonitorElement* ugmtMuonhwDXY;
   MonitorElement* ugmtMuonhwEta;
   MonitorElement* ugmtMuonhwPhi;
   MonitorElement* ugmtMuonhwEtaAtVtx;

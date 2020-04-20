@@ -39,6 +39,12 @@ void L1TStage2uGMTMuon::bookHistograms(DQMStore::IBooker& ibooker, const edm::Ru
   ugmtMuonhwPt = ibooker.book1D("ugmtMuonhwPt", (titlePrefix+"HW p_{T}").c_str(), 512, -0.5, 511.5);
   ugmtMuonhwPt->setAxisTitle("Hardware p_{T}", 1);
 
+  ugmtMuonhwPtUnconstrained = ibooker.book1D("ugmtMuonhwPtUnconstrained", (titlePrefix+"HW p_{T} unconstrained").c_str(), 512, -0.5, 511.5);
+  ugmtMuonhwPtUnconstrained->setAxisTitle("Hardware p_{T}", 1);
+
+  ugmtMuonhwDXY = ibooker.book1D("ugmtMuonhwDXY", (titlePrefix+"HW impact parameter").c_str(), 4, -0.5, 3.5);
+  ugmtMuonhwDXY->setAxisTitle("Hardware dXY", 1);
+
   ugmtMuonhwEta = ibooker.book1D("ugmtMuonhwEta", (titlePrefix+"HW #eta").c_str(), 461, -230.5, 230.5);
   ugmtMuonhwEta->setAxisTitle("Hardware Eta", 1);
 
@@ -151,6 +157,8 @@ void L1TStage2uGMTMuon::analyze(const edm::Event& e, const edm::EventSetup& c) {
 
       ugmtMuonBX->Fill(itBX);
       ugmtMuonhwPt->Fill(Muon->hwPt());
+      ugmtMuonhwPtUnconstrained->Fill(Muon->hwPtUnconstrained());
+      ugmtMuonhwDXY->Fill(Muon->hwDXY());
       ugmtMuonhwEta->Fill(Muon->hwEta());
       ugmtMuonhwPhi->Fill(Muon->hwPhi());
       ugmtMuonhwCharge->Fill(Muon->hwCharge());
@@ -187,4 +195,3 @@ void L1TStage2uGMTMuon::analyze(const edm::Event& e, const edm::EventSetup& c) {
     }
   }
 }
-
