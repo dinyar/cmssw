@@ -28,10 +28,10 @@ class L1TStage2MuonComp : public DQMEDAnalyzer {
   void bookHistograms(DQMStore::IBooker&, const edm::Run&, const edm::EventSetup&) override;
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
- private:  
+ private:
 
-  enum variables {BXRANGEGOOD=1, BXRANGEBAD, NMUONGOOD, NMUONBAD, MUONALL, MUONGOOD, PTBAD, ETABAD, PHIBAD, ETAATVTXBAD, PHIATVTXBAD, CHARGEBAD, CHARGEVALBAD, QUALBAD, ISOBAD, IDXBAD};
-  enum ratioVariables {RBXRANGE=1, RNMUON, RMUON, RPT, RETA, RPHI, RETAATVTX, RPHIATVTX, RCHARGE, RCHARGEVAL, RQUAL, RISO, RIDX};
+  enum variables {BXRANGEGOOD=1, BXRANGEBAD, NMUONGOOD, NMUONBAD, MUONALL, MUONGOOD, PTBAD, PTUNCONSTRBAD, DXYBAD, ETABAD, PHIBAD, ETAATVTXBAD, PHIATVTXBAD, CHARGEBAD, CHARGEVALBAD, QUALBAD, ISOBAD, IDXBAD};
+  enum ratioVariables {RBXRANGE=1, RNMUON, RMUON, RPT, RPTUNCONSTR, RDXY, RETA, RPHI, RETAATVTX, RPHIATVTX, RCHARGE, RCHARGEVAL, RQUAL, RISO, RIDX};
   bool incBin[RIDX+1];
 
   edm::EDGetTokenT<l1t::MuonBxCollection> muonToken1;
@@ -51,6 +51,8 @@ class L1TStage2MuonComp : public DQMEDAnalyzer {
   MonitorElement* muColl1BxRange;
   MonitorElement* muColl1nMu;
   MonitorElement* muColl1hwPt;
+  MonitorElement* muColl1hwPtUnconstrained;
+  MonitorElement* muColl1hwDXY;
   MonitorElement* muColl1hwEta;
   MonitorElement* muColl1hwPhi;
   MonitorElement* muColl1hwEtaAtVtx;
@@ -60,11 +62,13 @@ class L1TStage2MuonComp : public DQMEDAnalyzer {
   MonitorElement* muColl1hwQual;
   MonitorElement* muColl1hwIso;
   MonitorElement* muColl1Index;
-  MonitorElement* muColl1EtaPhimap; // This histogram will be filled only if enable2DComp is true 
+  MonitorElement* muColl1EtaPhimap; // This histogram will be filled only if enable2DComp is true
 
   MonitorElement* muColl2BxRange;
   MonitorElement* muColl2nMu;
   MonitorElement* muColl2hwPt;
+  MonitorElement* muColl2hwPtUnconstrained;
+  MonitorElement* muColl2hwDXY;
   MonitorElement* muColl2hwEta;
   MonitorElement* muColl2hwPhi;
   MonitorElement* muColl2hwEtaAtVtx;
@@ -75,7 +79,7 @@ class L1TStage2MuonComp : public DQMEDAnalyzer {
   MonitorElement* muColl2hwIso;
   MonitorElement* muColl2Index;
   MonitorElement* muColl2EtaPhimap; // This histogram will be filled only if enable2DComp is true
- 
+
 };
 
 #endif
