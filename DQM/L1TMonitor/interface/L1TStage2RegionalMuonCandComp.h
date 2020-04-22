@@ -28,11 +28,11 @@ class L1TStage2RegionalMuonCandComp : public DQMEDAnalyzer {
   void bookHistograms(DQMStore::IBooker&, const edm::Run&, const edm::EventSetup&) override;
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
- private:  
+ private:
   enum variables {BXRANGEGOOD=1, BXRANGEBAD, NMUONGOOD, NMUONBAD, MUONALL, MUONGOOD, PTBAD, ETABAD, LOCALPHIBAD, SIGNBAD, SIGNVALBAD, QUALBAD, HFBAD, LINKBAD, PROCBAD, TFBAD, TRACKADDRBAD, DXYBAD, PT2BAD};
   enum ratioVariables {RBXRANGE=1, RNMUON, RMUON, RPT, RETA, RLOCALPHI, RSIGN, RSIGNVAL, RQUAL, RHF, RLINK, RPROC, RTF, RTRACKADDR, RDXY, RPT2};
   enum tfs {BMTFBIN=1, OMTFNEGBIN, OMTFPOSBIN, EMTFNEGBIN, EMTFPOSBIN};
-  bool incBin[RPT2+1];  
+  bool incBin[RPT2+1];
 
   edm::EDGetTokenT<l1t::RegionalMuonCandBxCollection> muonToken1;
   edm::EDGetTokenT<l1t::RegionalMuonCandBxCollection> muonToken2;
@@ -44,7 +44,7 @@ class L1TStage2RegionalMuonCandComp : public DQMEDAnalyzer {
   std::vector<int> ignoreBin;
   bool verbose;
   bool isBmtf;
-  
+
   MonitorElement* summary;
   MonitorElement* errorSummaryNum;
   MonitorElement* errorSummaryDen;
@@ -64,7 +64,7 @@ class L1TStage2RegionalMuonCandComp : public DQMEDAnalyzer {
   MonitorElement* muColl1TrkAddrSize;
   MonitorElement* muColl1TrkAddr;
   MonitorElement* muColl1hwDXY;
-  MonitorElement* muColl1hwPt2; 
+  MonitorElement* muColl1hwPtUnconstrained;
 
   MonitorElement* muColl2BxRange;
   MonitorElement* muColl2nMu;
@@ -81,7 +81,7 @@ class L1TStage2RegionalMuonCandComp : public DQMEDAnalyzer {
   MonitorElement* muColl2TrkAddrSize;
   MonitorElement* muColl2TrkAddr;
   MonitorElement* muColl2hwDXY;
-  MonitorElement* muColl2hwPt2;
+  MonitorElement* muColl2hwPtUnconstrained;
 
 };
 

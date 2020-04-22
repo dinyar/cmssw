@@ -82,7 +82,7 @@ void L1TStage2RegionalMuonCandComp::bookHistograms(DQMStore::IBooker& ibooker, c
   summary->setBinLabel(TRACKADDRBAD, "track address mismatch", 1);
   if (isBmtf){
     summary->setBinLabel(DXYBAD, "DXY mismatch", 1);
-    summary->setBinLabel(PT2BAD, "P_{T}2 mismatch", 1);
+    summary->setBinLabel(PT2BAD, "P_{T} unconstrained mismatch", 1);
   }
 
   int nbinsNum = 14;
@@ -107,7 +107,7 @@ void L1TStage2RegionalMuonCandComp::bookHistograms(DQMStore::IBooker& ibooker, c
   errorSummaryNum->setBinLabel(RTRACKADDR, "track address mismatch", 1);
   if (isBmtf) {
     errorSummaryNum->setBinLabel(RDXY, "DXY mismatch", 1);
-    errorSummaryNum->setBinLabel(RPT2, "P_{T}2 mismatch", 1);
+    errorSummaryNum->setBinLabel(RPT2, "P_{T} unconstrained mismatch", 1);
   }
 
   // Change the label for those bins that will be ignored
@@ -167,8 +167,8 @@ void L1TStage2RegionalMuonCandComp::bookHistograms(DQMStore::IBooker& ibooker, c
   if (isBmtf) {
     muColl1hwDXY = ibooker.book1D("muhwDXYColl1", (muonColl1Title+" HW DXY"+trkAddrIgnoreText).c_str(), 4, 0, 4);
     muColl1hwDXY->setAxisTitle("Hardware DXY",1);
-    muColl1hwPt2 = ibooker.book1D("muhwPt2Coll1", (muonColl1Title+"HW p_{T}2"+trkAddrIgnoreText).c_str(), 512, -0.5, 511.5);
-    muColl1hwPt2->setAxisTitle("Hardware P_{T}2",1);
+    muColl1hwPtUnconstrained = ibooker.book1D("muhwPtUnconstrainedColl1", (muonColl1Title+"HW p_{T} unconstrained"+trkAddrIgnoreText).c_str(), 512, -0.5, 511.5);
+    muColl1hwPtUnconstrained->setAxisTitle("Hardware P_{T} unconstrained",1);
   }
 
   muColl2BxRange = ibooker.book1D("muBxRangeColl2", (muonColl2Title+" mismatching BX range").c_str(), 11, -5.5, 5.5);
@@ -208,8 +208,8 @@ void L1TStage2RegionalMuonCandComp::bookHistograms(DQMStore::IBooker& ibooker, c
   if (isBmtf) {
     muColl2hwDXY = ibooker.book1D("muhwDXYColl2", (muonColl2Title+" HW DXY"+trkAddrIgnoreText).c_str(), 4, 0, 4);
     muColl2hwDXY->setAxisTitle("Hardware DXY",1);
-    muColl2hwPt2 = ibooker.book1D("muhwPt2Coll2", (muonColl2Title+"HW p_{T}2"+trkAddrIgnoreText).c_str(), 512, -0.5, 511.5);
-    muColl2hwPt2->setAxisTitle("Hardware P_{T}2",1);
+    muColl2hwPtUnconstrained = ibooker.book1D("muhwPtUnconstrainedColl2", (muonColl2Title+"HW p_{T} unconstrained"+trkAddrIgnoreText).c_str(), 512, -0.5, 511.5);
+    muColl2hwPtUnconstrained->setAxisTitle("Hardware P_{T} unconstrained",1);
   }
 }
 
@@ -271,7 +271,7 @@ void L1TStage2RegionalMuonCandComp::analyze(const edm::Event& e, const edm::Even
           muColl1TrkAddrSize->Fill(muon1TrackAddr.size());
           if (isBmtf){
             muColl1hwDXY->Fill(muonIt1->hwDXY());
-            muColl1hwPt2->Fill(muonIt1->hwPt2());         
+            muColl1hwPtUnconstrained->Fill(muonIt1->hwPtUnconstrained());         
 	  }
           for (std::map<int, int>::const_iterator trIt1 = muon1TrackAddr.begin(); trIt1 != muon1TrackAddr.end(); ++trIt1) {
             muColl1TrkAddr->Fill(trIt1->first, trIt1->second);
@@ -294,7 +294,7 @@ void L1TStage2RegionalMuonCandComp::analyze(const edm::Event& e, const edm::Even
           muColl2TrkAddrSize->Fill(muon2TrackAddr.size());
           if (isBmtf){
             muColl2hwDXY->Fill(muonIt2->hwDXY());
-            muColl2hwPt2->Fill(muonIt2->hwPt2());
+            muColl2hwPtUnconstrained->Fill(muonIt2->hwPtUnconstrained());
 	  }
           for (std::map<int, int>::const_iterator trIt2 = muon2TrackAddr.begin(); trIt2 != muon2TrackAddr.end(); ++trIt2) {
             muColl2TrkAddr->Fill(trIt2->first, trIt2->second);
@@ -443,7 +443,7 @@ void L1TStage2RegionalMuonCandComp::analyze(const edm::Event& e, const edm::Even
             errorSummaryNum->Fill(RDXY);
           }
         }
-        if (muonIt1->hwPt2() != muonIt2->hwPt2()) {
+        if (muonIt1->hwPtUnconstrained() != muonIt2->hwPtUnconstrained()) {
           muonMismatch = true;
           summary->Fill(PT2BAD);
           if (incBin[RPT2]) {
@@ -468,7 +468,7 @@ void L1TStage2RegionalMuonCandComp::analyze(const edm::Event& e, const edm::Even
         muColl1TrkAddrSize->Fill(muon1TrackAddr.size());
         if (isBmtf){
           muColl1hwDXY->Fill(muonIt1->hwDXY());
-          muColl1hwPt2->Fill(muonIt1->hwPt2());
+          muColl1hwPtUnconstrained->Fill(muonIt1->hwPtUnconstrained());
 	}
         for (std::map<int, int>::const_iterator trIt1 = muon1TrackAddr.begin(); trIt1 != muon1TrackAddr.end(); ++trIt1) {
           muColl1TrkAddr->Fill(trIt1->first, trIt1->second);
@@ -487,7 +487,7 @@ void L1TStage2RegionalMuonCandComp::analyze(const edm::Event& e, const edm::Even
         muColl2TrkAddrSize->Fill(muon2TrackAddr.size());
         if (isBmtf){
           muColl2hwDXY->Fill(muonIt2->hwDXY());
-          muColl2hwPt2->Fill(muonIt2->hwPt2());
+          muColl2hwPtUnconstrained->Fill(muonIt2->hwPtUnconstrained());
 	}
         for (std::map<int, int>::const_iterator trIt2 = muon2TrackAddr.begin(); trIt2 != muon2TrackAddr.end(); ++trIt2) {
           muColl2TrkAddr->Fill(trIt2->first, trIt2->second);

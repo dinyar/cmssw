@@ -4,7 +4,7 @@
 /*
  * \file L1TStage2BMTF.h
  * \Author Esmaeel Eskandari Tadavani
- * \December 2015 
+ * \December 2015
 */
 
 // system requirements
@@ -67,25 +67,25 @@ protected:
   void bookHistograms(DQMStore::IBooker&, const edm::Run&, const edm::EventSetup&) override ;
 
 // data members
-private:  
+private:
 
   std::string monitorDir;
-  edm::InputTag bmtfSource; 
+  edm::InputTag bmtfSource;
   //  edm::InputTag bmtfSourceTwinMux1;
   //  edm::InputTag bmtfSourceTwinMux2;
   bool verbose ;
   bool kalman;
   edm::EDGetToken bmtfToken;
   // edm::EDGetToken bmtfTokenTwinMux1;
-  //  edm::EDGetToken bmtfTokenTwinMux2; 
+  //  edm::EDGetToken bmtfTokenTwinMux2;
   float global_phi;
 
-  MonitorElement* bmtf_hwEta; 
+  MonitorElement* bmtf_hwEta;
   MonitorElement* bmtf_hwLocalPhi;
   MonitorElement* bmtf_hwGlobalPhi;
-  MonitorElement* bmtf_hwPt;  
+  MonitorElement* bmtf_hwPt;
   MonitorElement* bmtf_hwQual;
-  MonitorElement* bmtf_proc; 
+  MonitorElement* bmtf_proc;
 
   MonitorElement* bmtf_wedge_bx;
   MonitorElement* bmtf_hwEta_hwLocalPhi;
@@ -94,13 +94,13 @@ private:
   MonitorElement* bmtf_hwPt_hwEta;
   MonitorElement* bmtf_hwPt_hwLocalPhi;
 
-  MonitorElement* bmtf_hwEta_bx;  
-  MonitorElement* bmtf_hwLocalPhi_bx;  
-  MonitorElement* bmtf_hwPt_bx;   
-  MonitorElement* bmtf_hwQual_bx; 
+  MonitorElement* bmtf_hwEta_bx;
+  MonitorElement* bmtf_hwLocalPhi_bx;
+  MonitorElement* bmtf_hwPt_bx;
+  MonitorElement* bmtf_hwQual_bx;
 
   MonitorElement* bmtf_hwDXY;
-  MonitorElement* bmtf_hwPt2;
+  MonitorElement* bmtf_hwPtUnconstrained;
 
 
   /* MonitorElement* bmtf_twinmuxInput_PhiBX; */
