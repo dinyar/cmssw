@@ -113,7 +113,6 @@ private:
   edm::InputTag m_barrelTfInputTag;
   edm::InputTag m_overlapTfInputTag;
   edm::InputTag m_endcapTfInputTag;
-  edm::InputTag m_trigTowerTag;
   std::shared_ptr<MicroGMTRankPtQualLUT> m_rankPtQualityLUT;
   MicroGMTIsolationUnit m_isolationUnit;
   MicroGMTCancelOutUnit m_cancelOutUnit;
@@ -124,7 +123,6 @@ private:
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_barrelTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_overlapTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_endcapTfInputToken;
-  edm::EDGetTokenT<MicroGMTConfiguration::CaloInputCollection> m_caloTowerInputToken;
 };
 
 //
@@ -149,7 +147,6 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig)
   m_barrelTfInputTag = iConfig.getParameter<edm::InputTag>("barrelTFInput");
   m_overlapTfInputTag = iConfig.getParameter<edm::InputTag>("overlapTFInput");
   m_endcapTfInputTag = iConfig.getParameter<edm::InputTag>("forwardTFInput");
-  m_trigTowerTag = iConfig.getParameter<edm::InputTag>("triggerTowerInput");
 
   m_autoBxRange = iConfig.getParameter<bool>("autoBxRange");
   m_bxMin = iConfig.getParameter<int>("bxMin");
@@ -168,7 +165,6 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig)
   m_barrelTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_barrelTfInputTag);
   m_overlapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_overlapTfInputTag);
   m_endcapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_endcapTfInputTag);
-  m_caloTowerInputToken = consumes<MicroGMTConfiguration::CaloInputCollection>(m_trigTowerTag);
 
   //register your products
   produces<MuonBxCollection>();
@@ -198,22 +194,16 @@ void L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<MicroGMTConfiguration::InputCollection> bmtfMuons;
   Handle<MicroGMTConfiguration::InputCollection> emtfMuons;
   Handle<MicroGMTConfiguration::InputCollection> omtfMuons;
-  Handle<MicroGMTConfiguration::CaloInputCollection> trigTowers;
 
   iEvent.getByToken(m_barrelTfInputToken, bmtfMuons);
   iEvent.getByToken(m_endcapTfInputToken, emtfMuons);
   iEvent.getByToken(m_overlapTfInputToken, omtfMuons);
-  iEvent.getByToken(m_caloTowerInputToken, trigTowers);
 
   // find out the BX range from the inputs
   // the smallest BX window defines the output BX window
   if (m_autoBxRange) {
     int bxMin = -1000;
     int bxMax = 1000;
-    if (!(m_caloInputsToDisable.all() || m_maskedCaloInputs.all())) {
-      bxMin = std::max(bxMin, trigTowers->getFirstBX());
-      bxMax = std::min(bxMax, trigTowers->getLastBX());
-    }
     if (!(m_bmtfInputsToDisable.all() || m_maskedBmtfInputs.all())) {
       bxMin = std::max(bxMin, bmtfMuons->getFirstBX());
       bxMax = std::min(bxMax, bmtfMuons->getLastBX());
@@ -253,7 +243,6 @@ void L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   imdMuonsOMTFNeg->setBXRange(m_bxMin, m_bxMax);
 
   for (int bx = m_bxMin; bx <= m_bxMax; ++bx) {
-    m_isolationUnit.setTowerSums(*trigTowers, bx);
     MicroGMTConfiguration::InterMuonList internMuonsBmtf;
     MicroGMTConfiguration::InterMuonList internMuonsEmtfPos;
     MicroGMTConfiguration::InterMuonList internMuonsEmtfNeg;
@@ -318,7 +307,6 @@ void L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     // sort internal muons and delete all but best 8
     sortMuons(internalMuons, 8);
 
-    m_isolationUnit.isolatePreSummed(internalMuons);
     // copy muons to output collection...
     for (const auto& mu : internalMuons) {
       if (mu->hwPt() > 0) {
