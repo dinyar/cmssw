@@ -11,6 +11,8 @@ L1TdeStage2uGT::L1TdeStage2uGT(const edm::ParameterSet& ps)
       dataSource_(consumes<GlobalAlgBlkBxCollection>(dataLabel_)),
       emulLabel_(ps.getParameter<edm::InputTag>("emulSource")),
       emulSource_(consumes<GlobalAlgBlkBxCollection>(emulLabel_)),
+      muonTokenData(consumes<l1t::MuonBxCollection>(ps.getParameter<edm::InputTag>("muonCollectionData"))),
+      muonTokenEmu(consumes<l1t::MuonBxCollection>(ps.getParameter<edm::InputTag>("muonCollectionEmu"))),
       triggerBlackList_(ps.getParameter<std::vector<std::string> >("triggerBlackList")),
       numBx_(ps.getParameter<int>("numBxToMonitor")),
       histFolder_(ps.getParameter<std::string>("histFolder")),
@@ -47,6 +49,12 @@ void L1TdeStage2uGT::analyze(const edm::Event& event, const edm::EventSetup& es)
   event.getByToken(dataSource_, dataCollection);
   edm::Handle<GlobalAlgBlkBxCollection> emulCollection;
   event.getByToken(emulSource_, emulCollection);
+
+  edm::Handle<l1t::MuonBxCollection> muonBxCollData;
+  edm::Handle<l1t::MuonBxCollection> muonBxCollEmu;
+  event.getByToken(muonTokenData, muonBxCollData);
+  event.getByToken(muonTokenEmu, muonBxCollEmu);
+
 
   if (!dataCollection.isValid()) {
     edm::LogError("L1TdeStage2uGT") << "Cannot find unpacked uGT readout record.";
@@ -100,12 +108,16 @@ void L1TdeStage2uGT::analyze(const edm::Event& event, const edm::EventSetup& es)
     hsummary = "dataEmulSummary_" + bxt.str();
 
     std::vector<GlobalAlgBlk>::const_iterator it_data, it_emul;
+    std::vector<l1t::Muon>::const_iterator it_muon_data, it_muon_emul;
     for (it_data = dataCollection->begin(ibx), it_emul = emulCollection->begin(ibx);
          it_data != dataCollection->end(ibx) && it_emul != emulCollection->end(ibx);
          ++it_data, ++it_emul) {
       // Fills algorithm bits histograms
       int numAlgs = it_data->getAlgoDecisionInitial().size();
-      for (int algoBit = 0; algoBit < numAlgs; ++algoBit) {
+      for (int algoBit = 153; algoBit < 309; ++algoBit) {
+        if (algoBit > 157 && algoBit < 300) {
+          continue;
+        }
         string algoName = "xxx";
         bool found = gtUtil_.getAlgNameFromBit(algoBit, algoName);
         if (not found)
@@ -129,6 +141,12 @@ void L1TdeStage2uGT::analyze(const edm::Event& event, const edm::EventSetup& es)
 
         // Check initial decisions
         if (it_data->getAlgoDecisionInitial(algoBit) != it_emul->getAlgoDecisionInitial(algoBit)) {
+          for (it_muon_data = muonBxCollData->begin(ibx); it_muon_data != muonBxCollData->end(ibx); ++it_muon_data) {
+            edm::LogWarning("uGTemulatorMismatch!") << "data hwPtUnconstrained():" << it_muon_data->hwPtUnconstrained() << " hwPt(): " << it_muon_data->hwPt() << " algo: " << algoBit << " fired? " << it_data->getAlgoDecisionInitial(algoBit)  << std::endl;
+          }
+          for (it_muon_emul = muonBxCollEmu->begin(ibx); it_muon_emul != muonBxCollEmu->end(ibx); ++it_muon_emul) {
+            edm::LogWarning("uGTemulatorMismatch!") << "emu hwPtUnconstrained():" << it_muon_emul->hwPtUnconstrained() << " hwPt(): " << it_muon_emul->hwPt() << " algo: " << algoBit << " fired? " << it_emul->getAlgoDecisionInitial(algoBit) << std::endl;
+          }
           if (it_data->getAlgoDecisionInitial(algoBit)) {
             hname = "DataNoEmul_" + bxt.str();
             fillHist(m_SummaryHistograms, hsummary, float(NInitalMismatchDataNoEmul), 1.);
@@ -140,6 +158,13 @@ void L1TdeStage2uGT::analyze(const edm::Event& event, const edm::EventSetup& es)
           }
           fillHist(m_HistNamesInitial, hname, float(algoBit), 1.);
           initDecisionMismatches_vs_LS->Fill(float(lumi), wt);
+        } else {
+          for (it_muon_data = muonBxCollData->begin(ibx); it_muon_data != muonBxCollData->end(ibx); ++it_muon_data) {
+            edm::LogWarning("uGTemulatorFine!") << "data hwPtUnconstrained():" << it_muon_data->hwPtUnconstrained() << " hwPt(): " << it_muon_data->hwPt() << " algo: " << algoBit << " fired? " << it_data->getAlgoDecisionInitial(algoBit) << std::endl;
+          }
+          for (it_muon_emul = muonBxCollEmu->begin(ibx); it_muon_emul != muonBxCollEmu->end(ibx); ++it_muon_emul) {
+            edm::LogWarning("uGTemulatorFine!") << "emu hwPtUnconstrained():" << it_muon_emul->hwPtUnconstrained() << " hwPt(): " << it_muon_emul->hwPt() << " algo: " << algoBit << " fired? " << it_data->getAlgoDecisionInitial(algoBit) << std::endl;
+          }
         }
 
         // Check final decisions

@@ -25,6 +25,7 @@
 
 #include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
 // #include "DataFormats/Provenance/interface/EventAuxiliary.h"
+#include "DataFormats/L1Trigger/interface/Muon.h"
 
 #include "CondFormats/RunInfo/interface/RunInfo.h"
 #include "CondFormats/DataRecord/interface/RunSummaryRcd.h"
@@ -48,6 +49,8 @@ private:
   edm::EDGetTokenT<GlobalAlgBlkBxCollection> dataSource_;
   edm::InputTag emulLabel_;
   edm::EDGetTokenT<GlobalAlgBlkBxCollection> emulSource_;
+  edm::EDGetTokenT<l1t::MuonBxCollection> muonTokenData;
+  edm::EDGetTokenT<l1t::MuonBxCollection> muonTokenEmu;
   std::vector<std::string> triggerBlackList_;
   int numBx_;
   std::string histFolder_;
