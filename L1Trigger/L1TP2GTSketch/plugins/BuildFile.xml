@@ -1,0 +1,6 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/PluginManager"/>
+<library file="*.cc" name="L1TP2GTSketchPlugins">
+  <flags EDM_PLUGIN="1"/>
+</library>

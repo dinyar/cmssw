@@ -1,0 +1,22 @@
+    {name}                 : entity work.p2gt_doubleObjCond
+      generic map (
+        different_objects => true,
+        pT1_cut => to_unsigned({pt1}, 14),
+        pT2_cut => to_unsigned({pt2}, 14),
+        minEta1_cut => to_signed({etaMin1}, 12),
+        maxEta1_cut => to_signed({etaMax1}, 12),
+        minEta2_cut => to_signed({etaMin2}, 12),
+        maxEta2_cut => to_signed({etaMax2}, 12)
+      )
+      port map (
+        clk           => clk, -- ipbus signals
+        rst           => rst,
+        ipb_in        => ipb_in,
+        ipb_out       => open,
+        clk_algo => clk_algo,
+        rst_algo => rst_algo,
+        objects_valid => delayed_valid(BX_ZERO),
+        object1 => delayed_objects(BX_ZERO)({object1}_SLOT),
+        object2 => delayed_objects(BX_ZERO)({object2}_SLOT),
+        algo_bit_out => algo_bits_int({algo_index})
+      );
